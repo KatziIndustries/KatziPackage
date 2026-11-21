@@ -1,3 +1,4 @@
+using System.IO.Compression;
 using Microsoft.Win32.SafeHandles;
 
 namespace Katzi.Package;
@@ -16,18 +17,31 @@ public static class KatziPackager
         "version.sh",
     ];
 
-    public static KatziPackage Extract(string filePath)
+    public static KatziPackage Parse(string filePath)
     {
         return new(filePath);
     }
 
-    public static KatziPackage Create(string directoryPath)
+    /// <summary>
+    /// Tries to create a .kpg from a directory.
+    /// This fails if any unknown files are present or any required files are missing.
+    /// </summary>
+    public static bool Create(string directoryPath, string? outputPath = null)
     {
-        return null!;
+        if (!Directory.Exists(directoryPath))
+            throw new DirectoryNotFoundException($"Couldn't find directory at '{directoryPath}'");
+
+        if (GetUnknownFiles(directoryPath) != null ||
+            GetMissingRequiredFiles(directoryPath) != null)
+            return false;
+
+        ZipFile.CreateFromDirectory(directoryPath, Path.Combine(outputPath ?? Directory.GetParent(directoryPath)!.FullName, GetDirectoryName(directoryPath) + ".kpg"));
+
+        return true;
     }
 
     /// <summary>
-    /// Returns all unknown files or null if all are present.
+    /// Returns all unknown files or null if none are present
     /// </summary>
     public static string[]? GetUnknownFiles(string directoryPath)
     {
@@ -82,7 +96,7 @@ public static class KatziPackager
         return [.. Directory.GetFileSystemEntries(directoryPath).Select((s) =>
             {
                 if (Directory.Exists(s))
-                    return s.TrimEnd('/')[(s.LastIndexOf("/") + 1)..s.Length] + "/";
+                    return GetDirectoryName(s) + "/";
 
                 string fileName = Path.GetFileName(s);
                 if (fileName.StartsWith("logo"))
@@ -90,5 +104,10 @@ public static class KatziPackager
 
                 return fileName;
             })];
+    }
+
+    private static string GetDirectoryName(string directoryPath)
+    {
+        return directoryPath.TrimEnd('/')[(directoryPath.LastIndexOf("/") + 1)..directoryPath.Length];
     }
 }

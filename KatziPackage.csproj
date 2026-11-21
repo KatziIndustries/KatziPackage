@@ -1,24 +1,27 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <OutputType>WinExe</OutputType>
+    <OutputType>library</OutputType>
     <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-
-    <PublishDir>publish</PublishDir>
-    <PublishAot>true</PublishAot>
-    <InvariantGlobalization>true</InvariantGlobalization>
-    
-    <!-- Do not generate debug symbols -->
-    <CopyDebugSymbolsToOutputDirectory>false</CopyDebugSymbolsToOutputDirectory>
-    <DebugSymbols>false</DebugSymbols>
-    <DebugType>none</DebugType>
+    <IsAotCompatible>true</IsAotCompatible>
   </PropertyGroup>
 
-  <ItemGroup>
-    <Content Include="KatziPackage.kpg" />
-  </ItemGroup>
+  <PropertyGroup>
+    <PackageProjectUrl>https://github.com/KatziIndustries/KatziPackage</PackageProjectUrl>
+    
+    <RepositoryType>git</RepositoryType>
+    <RepositoryUrl>https://github.com/KatziIndustries/KatziPackage</RepositoryUrl>
+    
+    <PackageLicenseExpression>GPLv3</PackageLicenseExpression>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+  
+    <Authors>AaronoLW</Authors>
+    <PackageId>KatziPackage</PackageId>
+    <Version>1.0.0</Version>
+    <Description>Simple library for parsing .kpg (KatziPackage) files</Description>
+  </PropertyGroup>
 
 </Project>
