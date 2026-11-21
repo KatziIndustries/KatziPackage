@@ -1,6 +1,4 @@
 using Katzi.Package;
-using SDL3;
-using SmashFramework;
 
 internal static class Program
 {
