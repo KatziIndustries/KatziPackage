@@ -5,12 +5,13 @@ namespace Katzi.Package;
 
 public class KatziPackage
 {
-#nullable disable
-    public Metadata Metadata { get; private set; }
-    public byte[] Logo { get; private set; } = null;
-    public string InstallScript { get; private set; } = null;
-    public string UninstallScript { get; private set; } = null;
-#nullable enable
+    public Metadata Metadata { get; private set; } = null!;
+    public byte[] Logo { get; private set; } = null!;
+    public string InstallScript { get; private set; } = null!;
+
+    public string? UninstallScript { get; private set; }
+    public string? BuildScript { get; private set; }
+    public string? VersionScript { get; private set; }
 
     public KatziPackage(string filePath)
     {
@@ -18,6 +19,7 @@ public class KatziPackage
             throw new FileNotFoundException($"KatziPackage at '{filePath}' could not be found");
 
         Parse(filePath);
+        Verify();
     }
 
     private void Parse(string filePath)
@@ -35,6 +37,8 @@ public class KatziPackage
                 case var name when name.StartsWith("logo"): Logo = content; break;
                 case "install.sh": InstallScript = contentString; break;
                 case "uninstall.sh": UninstallScript = contentString; break;
+                case "build.sh": BuildScript = contentString; break;
+                case "version.sh": VersionScript = contentString; break;
             }
         }
     }
@@ -46,10 +50,9 @@ public class KatziPackage
         if (Metadata == null) { error = true; Console.WriteLine("Missing metadata"); }
         if (Logo == null) { error = true; Console.WriteLine("Missing logo"); }
         if (InstallScript == null) { error = true; Console.WriteLine("Missing install.sh"); }
-        if (UninstallScript == null) { error = true; Console.WriteLine("Missing uninstall.sh"); }
 
         if (error)
-            throw new Exception();
+            throw new Exception("Files are missing");
     }
 
     private byte[] ExtractZipEntryContents(ZipArchiveEntry entry)
