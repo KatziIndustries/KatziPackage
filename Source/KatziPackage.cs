@@ -7,7 +7,9 @@ public class KatziPackage
 {
 #nullable disable
     public Metadata Metadata { get; private set; }
-    public byte[] Logo { get; private set; }
+    public byte[] Logo { get; private set; } = null;
+    public string InstallScript { get; private set; } = null;
+    public string UninstallScript { get; private set; } = null;
 #nullable enable
 
     public KatziPackage(string filePath)
@@ -27,12 +29,27 @@ public class KatziPackage
             byte[] content = ExtractZipEntryContents(entry);
             string contentString = Encoding.UTF8.GetString(content);
 
-            if (entry.FullName.Equals("metadata"))
-                Metadata = new(contentString);
-
-            if (entry.FullName.StartsWith("logo"))
-                Logo = content;
+            switch (entry.FullName)
+            {
+                case "metadata": Metadata = new(contentString); break;
+                case var name when name.StartsWith("logo"): Logo = content; break;
+                case "install.sh": InstallScript = contentString; break;
+                case "uninstall.sh": UninstallScript = contentString; break;
+            }
         }
+    }
+
+    private void Verify()
+    {
+        bool error = false;
+
+        if (Metadata == null) { error = true; Console.WriteLine("Missing metadata"); }
+        if (Logo == null) { error = true; Console.WriteLine("Missing logo"); }
+        if (InstallScript == null) { error = true; Console.WriteLine("Missing install.sh"); }
+        if (UninstallScript == null) { error = true; Console.WriteLine("Missing uninstall.sh"); }
+
+        if (error)
+            throw new Exception();
     }
 
     private byte[] ExtractZipEntryContents(ZipArchiveEntry entry)
