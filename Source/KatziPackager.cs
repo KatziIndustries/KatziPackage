@@ -25,19 +25,21 @@ public static class KatziPackager
     /// <summary>
     /// Tries to create a .kpg from a directory.
     /// This fails if any unknown files are present or any required files are missing.
+    /// Returns the path where the resulting .kpg got put or null on failure.
     /// </summary>
-    public static bool Create(string directoryPath, string? outputPath = null)
+    public static string? Create(string directoryPath, string? outputPath = null)
     {
         if (!Directory.Exists(directoryPath))
             throw new DirectoryNotFoundException($"Couldn't find directory at '{directoryPath}'");
 
         if (GetUnknownFiles(directoryPath) != null ||
             GetMissingRequiredFiles(directoryPath) != null)
-            return false;
+            return null;
 
-        ZipFile.CreateFromDirectory(directoryPath, Path.Combine(outputPath ?? Directory.GetParent(directoryPath)!.FullName, GetDirectoryName(directoryPath) + ".kpg"));
+        string destination = Path.Combine(outputPath ?? Directory.GetParent(directoryPath)!.FullName, GetDirectoryName(directoryPath) + ".kpg");
+        ZipFile.CreateFromDirectory(directoryPath, destination);
 
-        return true;
+        return destination;
     }
 
     /// <summary>
