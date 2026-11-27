@@ -26,7 +26,7 @@ public class KatziPackage : IDisposable
         TemporaryFilePath = Path.Combine("/tmp", "kpm-temp-" + Path.GetFileNameWithoutExtension(filePath));
         if (Directory.Exists(TemporaryFilePath))
         {
-            throw new Exception($"There's already a directory at {TemporaryFilePath}; exiting");
+            Directory.Delete(TemporaryFilePath, true);
         }
 
         ZipArchive archive = new(new FileStream(filePath, FileMode.Open));
