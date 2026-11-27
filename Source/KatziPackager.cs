@@ -1,5 +1,4 @@
 using System.IO.Compression;
-using Microsoft.Win32.SafeHandles;
 
 namespace Katzi.Package;
 
@@ -8,13 +7,12 @@ public static class KatziPackager
     public static readonly string[] RequiredFiles = [
         "metadata",
         "logo",
-        "install.sh",
+        "files/"
     ];
 
     public static readonly string[] OptionalFiles = [
-        "uninstall.sh",
-        "build.sh",
-        "version.sh",
+        "preinstall.sh",
+        "postinstall.sh",
     ];
 
     public static KatziPackage Parse(string filePath)
@@ -32,8 +30,8 @@ public static class KatziPackager
         if (!Directory.Exists(directoryPath))
             throw new DirectoryNotFoundException($"Couldn't find directory at '{directoryPath}'");
 
-        if (GetUnknownFiles(directoryPath) != null ||
-            GetMissingRequiredFiles(directoryPath) != null)
+        if (GetUnknownFiles(directoryPath).Length > 0 ||
+            GetMissingRequiredFiles(directoryPath).Length > 0)
             return null;
 
         string destination = Path.Combine(outputPath ?? Directory.GetParent(directoryPath)!.FullName, GetDirectoryName(directoryPath) + ".kpg");
@@ -43,9 +41,9 @@ public static class KatziPackager
     }
 
     /// <summary>
-    /// Returns all unknown files or null if none are present
+    /// Returns all unknown files
     /// </summary>
-    public static string[]? GetUnknownFiles(string directoryPath)
+    public static string[] GetUnknownFiles(string directoryPath)
     {
         string[] entries = FormatEntries(directoryPath);
 
@@ -54,13 +52,13 @@ public static class KatziPackager
         if (unknownFiles.Length > 0)
             return unknownFiles;
 
-        return null;
+        return [];
     }
 
     /// <summary>
-    /// Returns all missing required files or null if all are present.
+    /// Returns all missing required files
     /// </summary>
-    public static string[]? GetMissingRequiredFiles(string directoryPath)
+    public static string[] GetMissingRequiredFiles(string directoryPath)
     {
         if (!Directory.Exists(directoryPath))
             throw new DirectoryNotFoundException($"Couldn't find directory at '{directoryPath}'");
@@ -72,13 +70,13 @@ public static class KatziPackager
         if (missingRequiredFiles.Length > 0)
             return missingRequiredFiles;
 
-        return null;
+        return [];
     }
 
     /// <summary>
-    /// Returns all missing optional files or null if all are present.
+    /// Returns all missing optional files
     /// </summary>
-    public static string[]? GetMissingOptionalFiles(string directoryPath)
+    public static string[] GetMissingOptionalFiles(string directoryPath)
     {
         if (!Directory.Exists(directoryPath))
             throw new DirectoryNotFoundException($"Couldn't find directory at '{directoryPath}'");
@@ -90,7 +88,7 @@ public static class KatziPackager
         if (missingOptionalFiles.Length > 0)
             return missingOptionalFiles;
 
-        return null;
+        return [];
     }
 
     private static string[] FormatEntries(string directoryPath)

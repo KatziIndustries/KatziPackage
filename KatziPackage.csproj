@@ -20,12 +20,16 @@
   
     <Authors>AaronoLW</Authors>
     <PackageId>KatziPackage</PackageId>
-    <Version>1.0.1</Version>
+    <Version>1.0.2</Version>
     <Description>Simple library for parsing .kpg (KatziPackage) files</Description>
   </PropertyGroup>
   
   <ItemGroup>
     <None Include="README.md" Pack="true" PackagePath="/" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="Test/**" />
   </ItemGroup>
 
 </Project>
